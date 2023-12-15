@@ -1,0 +1,82 @@
+<!-- transformation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Transformation Results</title>
+    <!-- Include Bootstrap stylesheet -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f8f8;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        p {
+            line-height: 1.5;
+            color: #666;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Custom card style */
+        .custom-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Center-align buttons */
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Style for buttons */
+        .modeling-button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Data Transformation Results</h2>
+    <hr>
+
+    <!-- Card container -->
+    <div class="custom-card">
+        <p><strong>Cleaning Operations:</strong></p>
+        <p>{{ transformation_message|safe }}</p>
+    </div>
+
+    <hr>
+       
+
+    <!-- Button container -->
+    <div class="button-container">
+        <a href="{{ url_for('data_modeling') }}" class="btn btn-primary modeling-button">Data Modeling</a>
+        <a href="{{ url_for('modelling') }}" class="btn btn-success modeling-button">Machine Learning Modeling</a>
+    </div>
+
+    <!-- Include Bootstrap scripts at the end of the body -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

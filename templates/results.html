@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Data Analysis Results</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 60%;
+            text-align: center;
+        }
+
+        /* Custom Styles for Plots */
+        .plot-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .plot {
+            width: 48%; /* Adjust as needed based on your design */
+            margin-bottom: 20px;
+        }
+        table {
+            font-family: Arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+    
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+    
+        th {
+            background-color: #f2f2f2;
+        }
+    
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    
+        tr:hover {
+            background-color: #e5e5e5;
+        }
+        /* Button Styles */
+        #cleaning-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        #cleaning-button:hover {
+            background-color: #45a049;
+        }
+        /* Close button in modal */
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        /* Tab Styles */
+        .tab {
+            display: none;
+        }
+
+        .tab-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .tab-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <!-- Tab buttons -->
+    <button class="tab-button" onclick="openTab('tables')">Data Sanity Checks</button>
+    <button class="tab-button" onclick="openTab('plots')">Exploratory Data Analysis</button>
+    
+    <div id="tables" class="tab"  style="display: block;">
+        <button id="cleaning-button">Perform Cleaning Operations</button>
+        <h1>Data Sanity Checks</h1>
+        <hr>
+        <br>
+        <h2>Null Value Counts</h2>
+        <table>
+            <tr>
+                <th>Variable</th>
+                <th>Null Count</th>
+                <th>Drop</th> <!-- New column for action radio buttons -->
+                <th>Mean Impute</th> <!-- New column for action radio buttons -->
+            </tr>
+            {% for variable, null_count in null_counts.items() %}
+            <tr>
+                <td>{{ variable }}</td>
+                <td>{{ null_count }}</td>
+                <!-- Add radio buttons for "Drop" and "Mean Impute" actions -->
+                <td>
+                    <input type="radio" name="null_action_radio_{{ loop.index }}" value="drop">                     
+                </td>
+                <td>                    
+                    <input type="radio" name="null_action_radio_{{ loop.index }}" value="impute">
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <hr>
+        
+        <h2>Duplicate Rows</h2>
+        <table>
+            <tr>
+                {% for col in duplicates_df.columns %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+            {% for index, row in duplicates_df.iterrows() %}
+                <tr>
+                    {% for value in row %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <div>
+            <label>
+                <input type="radio" name="duplicate_action" value="keep"> Keep Duplicates
+            </label>
+            <label>
+                <input type="radio" name="duplicate_action" value="drop"> Drop Duplicates
+            </label>
+        </div>
+        <br>
+        <hr>
+        <h2>Data Type Inconsistencies</h2>
+        <table>
+            <tr>
+                <th>Column</th>
+                <th>Numeric Values</th>
+                <th>Object Values</th>
+                <th>Date Values</th>
+                <th>Inconsistency Percentage</th>
+                <th>Drop</th> <!-- New column for action radio buttons -->
+                <th>Mean Impute</th> <!-- New column for action radio buttons -->
+            </tr>
+            {% for index, row in inconsistency_df.iterrows() %}
+                <tr>
+                    <td>{{ row['column'] }}</td>
+                    <td>{{ row['numeric_vals'] }}</td>
+                    <td>{{ row['object_vals'] }}</td>
+                    <td>{{ row['date_vals'] }}</td>
+                    <td>{{ row['inconsistency_percentage'] }}</td>
+                    <td>
+                        <input type="radio" name="incon_action_radio_{{ loop.index }}" value="drop">                     
+                    </td>
+                    <td>                    
+                        <input type="radio" name="incon_action_radio_{{ loop.index }}" value="impute">
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        
+    </div>
+
+    <div id="plots" class="tab">
+        <h1>Exploratory Analysis</h1>
+        <hr>
+        <br>
+        <h2>Categorical Type Columns</h2>
+        <div class="plot-container">
+            {% for categorical_distribution in categorical_distributions %}
+                <div class="plot">
+                    <h3>{{ categorical_distribution['name'] }}</h3>
+                    <div id="categorical-{{ loop.index }}"></div>
+                </div>
+            {% endfor %}
+        </div>
+        <hr>
+        <br>
+    
+        <h2>Numeric Type Columns</h2>
+        <div class="plot-container">
+            {% for histogram_plot in histogram_plots %}
+                <div class="plot">
+                    <h3>{{ histogram_plot['name'] }}</h3>
+                    <div id="numeric-{{ loop.index }}"></div>
+                </div>
+            {% endfor %}
+        </div>
+        <hr>
+        <br>
+    
+        <h2>Correlation Heatmap for Numeric Columns</h2>
+        <div id="correlation-heatmap"></div>
+    
+        <h2>Contingency Plots</h2>
+        <div class="plot-container">
+            {% for contingency_plot in contingency_plots %}
+                <div class="plot">
+                    <h3>{{ contingency_plot['name'] }}</h3>
+                    <div id="contingency-{{ loop.index }}"></div>
+                </div>
+                {% if loop.index is divisibleby(2) %}
+                    </div><div class="plot-container">
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        var correlation_heatmap_div = document.getElementById('correlation-heatmap');
+        var contingency_plot_div = document.getElementById('contingency-plot');
+        var correlation_heatmap_data = {{ correlation_heatmap|safe }};
+        var contingency_plot_div = document.getElementById('contingency-plot');
+        Plotly.newPlot(correlation_heatmap_div, correlation_heatmap_data);        
+
+        {% for categorical_distribution in categorical_distributions %}
+            var categorical_plot{{ loop.index }} = document.getElementById('categorical-{{ loop.index }}');
+            var categorical_plot{{ loop.index }}_data = {{ categorical_distribution['plot']|safe }};
+            Plotly.newPlot(categorical_plot{{ loop.index }}, categorical_plot{{ loop.index }}_data);
+        {% endfor %}
+
+        {% for histogram_plot in histogram_plots %}
+            var numeric_plot{{ loop.index }} = document.getElementById('numeric-{{ loop.index }}');
+            var numeric_plot{{ loop.index }}_data = {{ histogram_plot['plot']|safe }};
+            Plotly.newPlot(numeric_plot{{ loop.index }}, numeric_plot{{ loop.index }}_data);
+        {% endfor %}
+        
+        {% for contingency_plot in contingency_plots %}
+            var contingency_plot{{ loop.index }} = document.getElementById('contingency-{{ loop.index }}');
+            var contingency_plot{{ loop.index }}_data = {{ contingency_plot['plot']|safe }};
+            Plotly.newPlot(contingency_plot{{ loop.index }}, contingency_plot{{ loop.index }}_data);
+        {% endfor %}
+    </script>
+
+
+   
+    
+    <!-- Modal dialog for displaying cleaning operation messages -->
+    <!-- 
+    <div id="cleaning-modal" class="modal">
+        <div class="modal-content">
+            <h2>Cleaning Operations</h2>
+            <p id="cleaning-message">Cleaning in progress...</p>
+            <a href="{{ url_for('modelling') }}">Go to Modeling</a>
+        </div>
+    </div> -->
+
+    <script>
+    // Get the cleaning button and modal
+    var cleaningButton = document.getElementById('cleaning-button');
+    cleaningButton.addEventListener('click', function () {
+            // Get selected radio button values
+            var duplicateAction = document.querySelector('input[name="duplicate_action"]:checked');
+            var nullactionRadios = document.querySelectorAll('input[name^="null_action_radio_"]:checked');
+            var inconactionRadios = document.querySelectorAll('input[name^="incon_action_radio_"]:checked');
+            
+            // Convert NodeLists to Arrays
+            nullactionRadios = Array.from(nullactionRadios).map(radio => radio.value);
+            inconactionRadios = Array.from(inconactionRadios).map(radio => radio.value);
+
+            // Construct the URL with selected values
+            var redirectURL = '/transform?duplicate_action=' + (duplicateAction ? duplicateAction.value : '') +
+                             '&null_action_radios=' + nullactionRadios.join(',') + '&incon_action_radios=' + inconactionRadios.join(',');
+
+            // Redirect to the transform page with selected values
+            window.location.href = redirectURL;
+    });
+   // When the cleaning button is clicked, redirect to the transform page                
+    </script>
+</body>
+<script>
+function openTab(tabName) {
+    var tabs = document.getElementsByClassName("tab");
+    for (var i = 0; i < tabs.length; i++) {
+        tabs[i].style.display = "none";
+    }
+    document.getElementById(tabName).style.display = "block";
+}
+</script>
+</html>

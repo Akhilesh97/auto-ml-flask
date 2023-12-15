@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Modeling</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        form {
+            background-color: #fff;
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Modeling</h1>
+    <form method="POST">
+        <div>
+            <label for="features">Select Features:</label>
+            <select name="features[]" id="features" multiple>
+                {% for feature in features %}
+                <option value="{{ feature }}">{{ feature }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="model">Select Model:</label>
+            <select name="model" id="model">
+                <option value="LogisticRegression">Logistic Regression</option>
+                <option value="DecisionTree">Decision Tree</option>
+            </select>
+        </div>
+        <button type="submit">Build Model</button>
+    </form>
+</body>
+</html>

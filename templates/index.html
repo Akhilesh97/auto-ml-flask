@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Science with Flask</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 6px 12px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Data Science with Flask</h1>
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+            <label for="csv_file" class="custom-file-upload">
+                Select a CSV File
+            </label>
+            <input type="file" name="csv_file" id="csv_file" accept=".csv">
+            <input type="submit" value="Upload CSV" >
+        </form>
+    </div>
+</body>
+</html>

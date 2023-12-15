@@ -1,1 +1,1 @@
-# auto-ml-flask
+# flask-ml
