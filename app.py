@@ -20,6 +20,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from numbers import Number
 import datetime
+import ml_pipeline
 
 app = Flask(__name__)
 
@@ -226,7 +227,7 @@ def download_cleaned_data():
     # Retrieve the cleaned data and provide it as a downloadable file
     # You should have the cleaned data available in your cleaning logic
     data = pd.read_csv("data/LoanApprovalPrediction.csv")
-    cleaned_data = data  # Replace with your cleaning logic
+    cleaned_data = ml_pipeline.get_clean_data(data)  # Replace with your cleaning logic
     cleaned_data_csv = io.BytesIO()
     cleaned_data.to_csv(cleaned_data_csv, index=False)
     cleaned_data_csv.seek(0)
@@ -247,7 +248,34 @@ def download_cleaned_data():
 
 @app.route('/data_modeling')
 def data_modeling():
-    return render_template('data_modeling.html')
+    import re
+    import etl_pipeline
+    def extract_table_names(sql_content):
+        table_names = set()
+    
+        # Use regular expression to find CREATE TABLE statements
+        create_table_regex = re.compile(r'CREATE TABLE\s+"?(\w+)"?\s*\(', re.IGNORECASE)
+    
+        matches = create_table_regex.findall(sql_content)
+        table_names.update(matches)
+    
+        return table_names
+    
+    # Replace this variable with the path to your SQL file
+    sql_file_path = 'db/init.sql'
+    
+    # Read the SQL file
+    with open(sql_file_path, 'r') as sql_file:
+        sql_content = sql_file.read()
+    
+    # Extract table names from the SQL file
+    msg1 = etl_pipeline.load_main_table()
+    
+    table_names = extract_table_names(sql_content)
+    msg2 = etl_pipeline.create_init_tables()
+    msg3 = etl_pipeline.load_data()
+    print(table_names, msg1, msg2, msg3)
+    return render_template('data_modeling.html', msg1=msg1, msg2=msg2, msg3=msg3)
 
 @app.route('/modelling', methods=['GET', 'POST'])
 def modelling():
@@ -263,37 +291,20 @@ def modelling():
         print(selected_features)
         selected_model = request.form['model']
         
-        
-        # Prepare the data with selected features
-        X = data[selected_features]
-        y = data['Loan_Status']
-
-        # Encode categorical variables if needed
-        encoder = LabelEncoder()
-        for col in X.select_dtypes(include='object'):
-            X[col] = encoder.fit_transform(X[col])
-
-        # Split the data into train and test sets
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
+        df_clean = data[selected_features]
+        df_clean["Loan_Status"] = data["Loan_Status"]
+                
         # Initialize the selected model
-        if selected_model == 'LogisticRegression':
-            model = LogisticRegression()
-        elif selected_model == 'DecisionTree':
-            model = DecisionTreeClassifier()
-
-        # Train the model
-        model.fit(X_train, y_train)
-
-        # Make predictions
-        y_pred = model.predict(X_test)
-
-        # Calculate accuracy
-        accuracy = accuracy_score(y_test, y_pred)
-
-        # Generate a classification report
-        report = classification_report(y_test, y_pred)
-
+        if selected_model == 'LR':
+            report, cm, accuracy = ml_pipeline.build_logistic_regression(df_clean)
+        elif selected_model == 'DT':
+            report, cm, accuracy = ml_pipeline.build_decision_tree(df_clean)
+        elif selected_model == "KNN":
+            report, cm, accuracy = ml_pipeline.build_knn(df_clean)
+        elif selected_model == "NB":
+            report, cm, accuracy = ml_pipeline.build_nb(df_clean)
+        elif selected_model == "SVM":
+            report, cm, accuracy = ml_pipeline.build_svm(df_clean)
         return render_template('metrics.html', accuracy=accuracy, classification_report=report)
 
     # Get the list of available features

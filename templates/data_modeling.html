@@ -1,0 +1,125 @@
+<!-- data_modeling.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Modeling</title>
+    <!-- Add Bootstrap CSS link or your preferred styling framework -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f8f8;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .card-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            width: 30%;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .card-text {
+            line-height: 1.5;
+            color: #666;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .animated-sequence {
+            animation: fadeIn 1s ease-in-out;
+        }
+        #loading-message {
+            text-align: center;
+            margin: 20px;
+            color: #666;
+        }
+        /* Style for buttons */
+        .modeling-button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-message">
+        <p>Loading...</p>
+    </div>
+    <h2 class="animated-sequence">ETL Steps Performed</h2>
+
+    <!-- Card container for messages -->
+    <div class="card-container animated-sequence">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Step 1: Load Main Table</h5>
+                <p class="card-text">{{ msg1 }}</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Step 2: Create Initialization Tables</h5>
+                <p class="card-text">{{ msg2 }}</p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Step 3: Load Data</h5>
+                <p class="card-text">{{ msg3 }}</p>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <h2>Data Model used</h2>
+    <div style="text-align: center;">
+        <img src="{{ url_for('static', filename='data_model.jpg') }}" alt="Data Model" style="max-width: 100%; height: auto;">
+    </div>
+    <hr>
+    <a href="{{ url_for('modelling') }}" class="btn btn-success modeling-button">Machine Learning Modeling</a>
+    <!-- ... (other content) ... -->
+
+    <!-- Include Bootstrap scripts at the end of the body -->
+    <!-- Include Bootstrap scripts at the end of the body -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Add JavaScript to hide the loading message when the page is loaded -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Hide the loading message
+            document.getElementById("loading-message").style.display = "none";
+        });
+    </script>
+</body>
+</html>
