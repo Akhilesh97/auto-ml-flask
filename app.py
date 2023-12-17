@@ -245,8 +245,13 @@ def download_cleaned_data():
                      as_attachment=True,
                      download_name=cleaned_data_filename,
                      mimetype='text/csv')
+def query_table_from_database(table_name):
+    # Implement your logic to query the specified table from the database
+    # and return the data as a DataFrame.
+    # Replace this with your actual database query logic.
+    return pd.DataFrame()
 
-@app.route('/data_modeling')
+@app.route('/data_modeling',methods=['GET', 'POST'])
 def data_modeling():
     import re
     import etl_pipeline
@@ -269,13 +274,43 @@ def data_modeling():
         sql_content = sql_file.read()
     
     # Extract table names from the SQL file
-    msg1 = etl_pipeline.load_main_table()
-    
     table_names = extract_table_names(sql_content)
-    msg2 = etl_pipeline.create_init_tables()
-    msg3 = etl_pipeline.load_data()
+    if etl_pipeline.table_check(table_names):
+        msg1 = "Table already loaded"
+        msg2 = "Init tables already created"
+        msg3 = "Diemension and Fact tables already loaded"
+    else:
+        msg1 = etl_pipeline.load_main_table()        
+        msg2 = etl_pipeline.create_init_tables()
+        msg3 = etl_pipeline.load_data()
+    
     print(table_names, msg1, msg2, msg3)
-    return render_template('data_modeling.html', msg1=msg1, msg2=msg2, msg3=msg3)
+    # Handle the selected table from the dropdown
+    selected_table = request.form.get('selected_table')
+    if selected_table == None:
+        selected_table = "dim_gender"
+    queried_table = etl_pipeline.query_table(selected_table)
+    print(queried_table)
+    return render_template('data_modeling.html', msg1=msg1, msg2=msg2, msg3=msg3, table_names = table_names,selected_table=selected_table, queried_table=queried_table)
+
+
+@app.route('/download_table/<table_name>')
+def download_table(table_name):
+    # Assume queried_table is a DataFrame containing the queried data
+    queried_table = query_table_from_database(table_name)
+
+    if queried_table is not None:
+        # Save the queried table CSV file in the current directory
+        queried_table_csv_filename = f'data/{table_name}_queried_table.csv'
+        queried_table_csv_path = os.path.join(os.getcwd(), queried_table_csv_filename)
+        queried_table.to_csv(queried_table_csv_path, index=False)
+
+        return send_file(queried_table_csv_path,
+                         as_attachment=True,
+                         download_name=queried_table_csv_filename,
+                         mimetype='text/csv')
+
+    return "Error: Table not found or unable to query."
 
 @app.route('/modelling', methods=['GET', 'POST'])
 def modelling():
@@ -305,7 +340,9 @@ def modelling():
             report, cm, accuracy = ml_pipeline.build_nb(df_clean)
         elif selected_model == "SVM":
             report, cm, accuracy = ml_pipeline.build_svm(df_clean)
-        return render_template('metrics.html', accuracy=accuracy, classification_report=report)
+        cm_json = json.dumps(cm.tolist())
+
+        return render_template('metrics.html', accuracy=accuracy, classification_report=report, cm=cm_json)
 
     # Get the list of available features
     available_features = data.columns.tolist()

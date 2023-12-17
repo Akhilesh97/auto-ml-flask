@@ -100,12 +100,56 @@
         </div>
     </div>
     <hr>
-    <h2>Data Model used</h2>
-    <div style="text-align: center;">
-        <img src="{{ url_for('static', filename='data_model.jpg') }}" alt="Data Model" style="max-width: 100%; height: auto;">
+    <div class = "row">
+        <div class="col-md-6" style="text-align: center;">
+            <h2>Data Model used</h2>        
+            <img src="{{ url_for('static', filename='data_model.jpg') }}" alt="Data Model" style="max-width: 100%; height: auto;"> 
+        </div>                   
+        <div class="col-md-6">
+            <h2>Select Table</h2>
+            <form method="POST" action="{{ url_for('data_modeling') }}">
+                <div class="form-group">
+                    <label for="tableSelect">Select a Table:</label>
+                    <select class="form-control" id="tableSelect" name="selected_table">
+                        {% for table_name in table_names %}
+                            <option value="{{ table_name }}">{{ table_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Query and Display Table</button>
+            </form>
+            <!-- Display the queried table -->
+            {% if queried_table.empty %}
+            <p>No data available for the selected table.</p>
+            {% else %}
+                <hr>
+                <h2>Queried Table</h2>
+                <div style="overflow-x: auto; overflow-y: auto; max-height: 400px;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                {% for col in queried_table.columns %}
+                                    <th>{{ col }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for index, row in queried_table.iterrows() %}
+                                <tr>
+                                    {% for value in row %}
+                                        <td>{{ value }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{{ url_for('download_table', table_name=selected_table) }}" class="btn btn-success">Download Queried Table</a>
+            {% endif %}
+            <a href="{{ url_for('modelling') }}" class="btn btn-success modeling-button">Machine Learning Modeling</a>
+        </div>
     </div>
-    <hr>
-    <a href="{{ url_for('modelling') }}" class="btn btn-success modeling-button">Machine Learning Modeling</a>
+    
     <!-- ... (other content) ... -->
 
     <!-- Include Bootstrap scripts at the end of the body -->

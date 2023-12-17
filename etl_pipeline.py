@@ -37,10 +37,24 @@ def getconn():
 
 # create connection pool with 'creator' argument to our connection object function
 pool = sqlalchemy.create_engine(
-    "postgresql+pg8000://",
+    "postgresql+pg8000://", 
     creator=getconn,
 )
+def query_table(table_name):
+    with pool.connect() as db_conn:
+        # query and fetch ratings table
+        results = db_conn.execute(sqlalchemy.text("SELECT * FROM %s;"%table_name)).fetchall()
+        print(len(results))
+            
+    return pd.DataFrame(results)
 
+def table_check(table_names):
+    for table in table_names:
+        df = query_table(table)
+        if len(df)>0:
+            return True
+        else:
+            return False
 def load_main_table():
     df.to_sql("loan_approvals", pool, if_exists="replace", index=False)
     return "Initial Cleaned CSV Loaded Successfully"
@@ -60,4 +74,5 @@ def load_data():
             query = sqlalchemy.sql.text(file.read())        
             db_conn.execute(query)
             db_conn.commit()
+            
     return "Data Loaded Successfully"

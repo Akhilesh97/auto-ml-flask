@@ -1,12 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Model Metrics</title>
+    <!-- Include Bootstrap stylesheet -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Include Plotly for heatmap visualization -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f8f8;
+            margin: 20px;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 20px;
+        }
+
+        p {
+            line-height: 1.5;
+            color: #666;
+        }
+
+        pre {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+
+        .heatmap-container {
+            margin-top: 20px;
+        }
+
+        /* Add your custom styles here */
+    </style>
 </head>
 <body>
-    <h1>Model Metrics</h1>
-    <p>Accuracy: {{ accuracy }}</p>
-    <h2>Classification Report:</h2>
-    <pre>{{ classification_report }}</pre>
+    <div class="container">
+        <h1>Model Metrics</h1>
+        <p>Accuracy: {{ accuracy }}</p>
+
+        <h2>Confusion Matrix:</h2>
+        <div class="heatmap-container">
+            <div id="confusion-heatmap"></div>
+        </div>
+
+        <h2>Classification Report:</h2>
+        <pre>{{ classification_report }}</pre>
+    </div>
+
+    <!-- Include Bootstrap scripts and Plotly at the end of the body -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <script>
+        // Generate heatmap data from the confusion matrix
+        var confusionMatrix = {{ cm|safe }};
+        var heatmapData = [{
+            z: confusionMatrix,
+            type: 'heatmap',
+            colorscale: 'Viridis',
+        }];
+
+        // Layout for heatmap
+        var heatmapLayout = {
+            title: 'Confusion Matrix',
+            xaxis: { title: 'Predicted Labels' },
+            yaxis: { title: 'True Labels' },
+            width: 700,
+            height: 500,
+        };
+
+        // Create heatmap
+        Plotly.newPlot('confusion-heatmap', heatmapData, heatmapLayout);
+    </script>
 </body>
 </html>
