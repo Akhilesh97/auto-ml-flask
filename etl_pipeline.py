@@ -50,13 +50,17 @@ def query_table(table_name):
 
 def table_check(table_names):
     for table in table_names:
-        df = query_table(table)
-        if len(df)>0:
-            return True
-        else:
+        try:
+            df = query_table(table)
+            if len(df) > 0:
+                return True
+            else:
+                return False
+        except Exception as e:            
+            print(e)
             return False
 def load_main_table():
-    df.to_sql("loan_approvals", pool, if_exists="replace", index=False)
+    print(df.to_sql("loan_approvals", pool, if_exists="replace", index=False))
     return "Initial Cleaned CSV Loaded Successfully"
 
 def create_init_tables():

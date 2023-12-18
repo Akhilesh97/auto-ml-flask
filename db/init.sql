@@ -1,32 +1,4 @@
-DO $$ DECLARE
-rec RECORD;
-BEGIN
-	FOR rec IN (
-	SELECT
-		tablename
-	FROM
-		pg_tables
-	WHERE
-		schemaname = 'public') LOOP
-EXECUTE 'DROP TABLE IF EXISTS ' || rec.tablename || ' CASCADE';
-END LOOP;
-END $$;
 
-CREATE TABLE loan_approvals (
-    "Loan_ID" VARCHAR,
-    "Gender" VARCHAR,
-    "Married" VARCHAR,
-    "Dependents" VARCHAR,
-    "Education" VARCHAR,
-    "Self_Employed" VARCHAR,
-    "ApplicantIncome" NUMERIC(6),
-    "CoapplicantIncome" NUMERIC(6),
-    "LoanAmount" NUMERIC(3),
-    "Loan_Amount_Term" VARCHAR,
-    "Credit_History" VARCHAR,
-    "Property_Area" VARCHAR,
-    "Loan_Status" VARCHAR
-);
 
 CREATE TABLE dim_gender (
     "Gender_ID" SERIAL PRIMARY KEY,
