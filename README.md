@@ -16,7 +16,7 @@ docker run -p 5000:5000 flask-docker-app
 Access your app at http://localhost:5000.
 
 ### Pipeline architecture
-![Pipeline architecture](https://github.com/Akhilesh97/auto-ml-flask/blob/main/static/architecture.jpg "Architecture")
+![Pipeline architecture](https://github.com/Akhilesh97/auto-ml-flask/blob/dockerize/static/architecture.jpg "Architecture")
 
 ### Data Model
 
